@@ -1,0 +1,15 @@
+# Core dependencies for Local AI Voice Assistant
+SpeechRecognition>=3.8.1
+sentence-transformers>=2.0.0
+scikit-learn>=1.0.0
+numpy>=1.21.0
+PyAutoGUI>=0.9.50
+
+# Audio processing dependencies
+PyAudio>=0.2.11
+
+# Additional utilities (optional)
+requests>=2.25.0
+
+# System interaction (optional)
+psutil>=5.8.0
