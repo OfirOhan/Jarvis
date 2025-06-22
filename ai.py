@@ -21,21 +21,50 @@ COMMAND_TEMPLATES = {
     },
     "play_pause": {
         "type": 0,
-        "confidence_threshold": 0.5,  # Low - safe to trigger
+        "confidence_threshold": 0.6,
         "examples": [
-            "play", "pause", "play pause", "stop", "resume", "start playing",
-            "pause music", "resume music", "toggle play", "hit play"
+            "play", "pause", "play pause", "resume", "stop"
         ],
-        "response": "Playing/pausing media"
+        "response": "Controlling media playback"
     },
+    "youtube_music_play_pause": {
+        "type": 0,
+        "confidence_threshold": 0.7,
+        "examples": [
+            "play music", "pause music", "play youtube music", "pause youtube music",
+            "resume music", "stop music", "music play", "music pause", "stop youtube music"
+        ],
+        "response": "Controlling YouTube Music"
+    },
+
+    "youtube_play_pause": {
+        "type": 0,
+        "confidence_threshold": 0.7,
+        "examples": [
+            "play youtube", "pause youtube", "play video", "pause video",
+            "resume youtube", "stop youtube", "youtube play", "youtube pause"
+        ],
+        "response": "Controlling YouTube"
+    },
+
     "stremio_play_pause": {
         "type": 0,
-        "confidence_threshold": 0.5,
+        "confidence_threshold": 0.7,
         "examples": [
-            "stremio play", "stremio pause", "stremio play pause", "stremio stop",
-            "pause video", "play video", "pause movie", "play movie"
+            "play stremio", "pause stremio", "resume stremio", "stop stremio",
+            "stremio play", "stremio pause"
         ],
-        "response": "Playing/pausing Stremio"
+        "response": "Controlling Stremio"
+    },
+
+    "music_play_pause": {
+        "type": 0,
+        "confidence_threshold": 0.7,
+        "examples": [
+            "play spotify", "pause spotify", "spotify play", "spotify pause",
+            "play song", "pause song", "next song", "previous song"
+        ],
+        "response": "Controlling music player"
     },
     "stremio_fullscreen": {
         "type": 0,
@@ -244,19 +273,3 @@ class IntentClassifier:
             "response": self.command_templates.get(best_command, {}).get("response", "Command not recognized"),
             "threshold": self.command_templates.get(best_command, {}).get("confidence_threshold", 0.5)
         }
-
-    def add_custom_command(self, command_name: str, examples: list, response: str,
-                           confidence_threshold: float = 0.7, command_type: int = 0):
-        """Add a custom command template"""
-        self.command_templates[command_name] = {
-            "type": command_type,
-            "confidence_threshold": confidence_threshold,
-            "examples": examples,
-            "response": response
-        }
-
-        # Recompute embeddings for the new command
-        embeddings = self.sentence_model.encode(examples)
-        self.command_embeddings[command_name] = embeddings
-
-        print(f"Added custom command: {command_name}")
