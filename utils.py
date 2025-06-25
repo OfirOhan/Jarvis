@@ -54,7 +54,7 @@ def normalize_key_name(key_text: str) -> str:
 class SafetyChecker:
     """Handles dangerous command safety checks"""
 
-    def __init__(self, dangerous_commands: Set[str] = None, cooldown_seconds: int = 10):
+    def __init__(self, dangerous_commands: Set[str] = None, cooldown_seconds: int = 20):
         self.dangerous_commands = dangerous_commands or {"shutdown", "restart"}
         self.cooldown_seconds = cooldown_seconds
         self.last_dangerous_command_time = 0

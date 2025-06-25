@@ -56,17 +56,55 @@ class CommandRegistry:
             "press_button": self.text.press_button,
         }
 
-    def execute_command(self, intent: str, params: Dict[str, Any] = None) -> bool:
-        """Execute a command by name"""
+    def execute_command(self, intent: str, params: Dict[str, Any] = None, log_intent: bool = True) -> bool:
+        """
+        Execute a command or compound commands by name.
+        Supports compound commands returned by the AI model.
+        Cleans up dynamic parameters like 'content' before passing them to handlers.
+        log_intent: If False, suppress logging the top-level intent to avoid duplicate logs.
+        """
+        # 1. Handle compound commands
+        if intent == "compound_command":
+            if params and isinstance(params.get("commands"), list):
+                logger.info(f"Executing compound command sequence ({len(params['commands'])} commands)")
+                all_success = True
+                for sub_cmd in params["commands"]:
+                    sub_intent = sub_cmd.get("intent")
+                    sub_params = sub_cmd.get("parameters", {}) or {}
+                    sub_confidence = sub_cmd.get("confidence")
+                    sub_threshold = sub_cmd.get("threshold")
+
+                    if isinstance(sub_params, dict) and "content" in sub_params:
+                        sub_params["content"] = sub_params["content"].strip()
+
+                    logger.info(
+                        f"Executing sub-intent '{sub_intent}' (confidence={sub_confidence:.2f}, threshold={sub_threshold:.2f})"
+                    )
+                    success = self.execute_command(sub_intent, sub_params, log_intent=False)
+                    all_success = all_success and success
+                return all_success
+            else:
+                logger.warning("Compound command intent received, but no subcommands found!")
+                return False
+
+        # 2. Handle single commands
         if intent not in self.command_map:
-            print(f"Unknown command: {intent}")
+            logger.error(f"Unknown command: {intent}")
             return False
 
         try:
             handler = self.command_map[intent]
+
+            if params and isinstance(params, dict) and "content" in params:
+                params["content"] = params["content"].strip()
+
+            # Log the top-level intent execution only if log_intent is True
+            if log_intent:
+                logger.info(f"Executing intent '{intent}' with params={params}")
+
             return handler(params)
         except Exception as e:
-            print(f"Command execution error for '{intent}': {e}")
+            logger.exception(f"Command execution error for '{intent}': {e}")
             return False
 
     def get_available_commands(self) -> list:

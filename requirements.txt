@@ -19,3 +19,4 @@ pywin32>=227; sys_platform == "win32"
 
 # Enhanced logging and debugging
 colorama>=0.4.4
+pyttsx3~=2.98

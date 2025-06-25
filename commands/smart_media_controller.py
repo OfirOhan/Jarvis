@@ -98,7 +98,6 @@ class SmartMediaController:
                     logger.error(f"Browser check error: {e}")
 
         if not media_sources:
-            print("[DEBUG] No media sources found")
             return None
 
         # Get currently focused window
